@@ -1,10 +1,14 @@
-// variable without events
+//variables without events
 let canvaSize;
 let elemetSize;
 
-
+const playerPositon={
+    x:undefined,
+    y:undefined,
+}
 // control by typing a key
 window.addEventListener('keydown',keyBoardControl);
+
 //constrols by clicking a button
 const goUp = document.querySelector('#up');
 const goLeft = document.querySelector('#left');
@@ -36,7 +40,7 @@ function setCanvasSize(){
 function startGame(){
 
     //defining the size to the objects
-    const elemetSize = canvaSize / 10;
+    elemetSize = canvaSize / 10;
     displayLevels.font= elemetSize + 'px Verdana';
     displayLevels.textAlign = 'end';
 
@@ -46,13 +50,27 @@ function startGame(){
     const rowMapColumn = rowMap.map(row => row.trim().split(''));
 
     console.log(rowMapColumn);
+    //!limpiando todo mapa para rendeizar una nueva posicion del jugador
+    displayLevels.clearRect(0,0,canvaSize,canvaSize);
 
+    //*Recorriendo el array para renderizar el mapa
     rowMapColumn.forEach((row, rowIndex) => {
         row.forEach((column,columnIndex) =>{
             const figureMap = emojis[column];
             const posX = elemetSize * (columnIndex + 1);
             const posY = elemetSize * (rowIndex + 1);
             displayLevels.fillText(figureMap,posX,posY);
+
+            //*renderizando la posicion inicial del jugador
+            if(column === 'O'){
+                if(!playerPositon.x && !playerPositon.y){
+                    playerPositon.x = posX;
+                    playerPositon.y = posY;
+                    //console.log(playerPositon);
+                    displayLevels.fillText(figureMap,playerPositon.x,playerPositon.y);
+                }
+            }
+            displayPlayer();
         });
     });
             
@@ -64,6 +82,10 @@ function startGame(){
     // displayLevels.font = '25px Verdana';
     // displayLevels.fillStyle='purple'
     // displayLevels.fillText('Carlos',25,25);
+}
+
+function displayPlayer(){
+    displayLevels.fillText(emojis['PLAYER'],playerPositon.x,playerPositon.y);
 }
 
 
@@ -99,13 +121,34 @@ goDown.addEventListener('click',moveDown);
 
 function moveUp(){
     console.log('Arriba');
+    if(playerPositon.y > elemetSize){
+        playerPositon.y -=elemetSize;
+    }
+    console.log(playerPositon);
+    startGame();
 }
 function moveLeft(){
     console.log('Izquierda');
+    if(playerPositon.x > (elemetSize+10)){
+        playerPositon.x -=elemetSize;
+    }
+    console.log(playerPositon);
+    startGame();
 }
 function moveRight(){
     console.log('Derecha');
+    if(playerPositon.x < (elemetSize *10)){
+        playerPositon.x += elemetSize;
+    }
+    console.log(playerPositon);
+    startGame();
 }
 function moveDown(){
     console.log('Abajo');
+    if(playerPositon.y < (elemetSize *10)){
+        playerPositon.y += elemetSize;
+    }
+    console.log(playerPositon);
+    startGame();
 }
+
