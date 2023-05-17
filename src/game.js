@@ -14,9 +14,13 @@ const bambooPosition={
 
 
 let enemyCollisions=[];
-const heart = ['❤️','❤️','❤️'];
 let level=0;
 let lives=3;
+
+let timeStart;
+let timePlayer;
+let timeInterval;
+
 // control by typing a key
 window.addEventListener('keydown',keyBoardControl);
 
@@ -27,6 +31,7 @@ const goRight = document.querySelector('#right');
 const goDown = document.querySelector('#down');
 const containerStatics = document.querySelector('.statics');
 const displayLives = document.querySelector('#lives');
+const displayTimer = document.querySelector('#timer');
 
 
 
@@ -62,6 +67,11 @@ function startGame(){
     if(!map){
         wonGame();
         return;
+    }
+
+    if(!timeStart){
+        timeStart=Date.now();
+        timeInterval=setInterval(timerControl,100);
     }
     const rowMap = map.trim().split('\n');
     const rowMapColumn = rowMap.map(row => row.trim().split(''));
@@ -135,13 +145,17 @@ function nextLevel(){
     startGame();
 }
 function failedLevel(){
+    //sistema de vidas
+    showLives();
+
     lives--;
-    console.log(lives);
+    // console.log(lives);
 
     //**Reiniciando el juego al nivel inicial al perder todas las vidas */
     if(lives <= 0){
         level=0;
         lives=3;
+        timeStart=undefined;
     }
     
     //**Reiniciando el mismo nivel al colisionar una vez */
@@ -149,15 +163,20 @@ function failedLevel(){
     playerPosition.y=undefined;
     startGame();
 }
+
 function wonGame(){
     console.log("Ganaste el juego");
+    clearInterval(timeInterval);
 }
-// function showLives(){
-//     for (let index = 0; index < heart.length; index++) {
-//         displayLives.textContent = heart[index];
-//         containerStatics.appendChild(displayLevels);
-//     }
-// }
+
+function showLives(){
+    displayLives.innerHTML=emojis['HEART'].repeat(lives);
+}
+
+function timerControl(){
+    displayTimer.innerHTML = (Date.now() - timeStart)/1000;
+}
+
 function keyBoardControl(event){
     const key = event.code;
     
