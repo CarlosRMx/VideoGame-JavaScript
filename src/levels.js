@@ -48,3 +48,63 @@ maps.push(`
   XX-----OXX
   XXXXXXXXXX
 `);
+
+
+
+function startGame() {
+  console.log({ canvasSize, elementsSize });
+  // console.log(window.innerWidth, window.innerHeight);
+
+  game.font = elementsSize + 'px Verdana';
+  game.textAlign = 'end';
+
+  const map = maps[level];
+
+  if (!map) {
+    gameWin();
+    return;
+  }
+
+  if (!timeStart) {
+    timeStart = Date.now();
+    timeInterval = setInterval(showTime, 100);
+    showRecord();
+  }
+  
+  const mapRows = map.trim().split('\n');
+  const mapRowCols = mapRows.map(row => row.trim().split(''));
+  console.log({map, mapRows, mapRowCols});
+
+  showLives();
+  
+  enemyPositions = [];
+  game.clearRect(0,0,canvasSize, canvasSize);
+
+  mapRowCols.forEach((row, rowI) => {
+    row.forEach((col, colI) => {
+      const emoji = emojis[col];
+      const posX = elementsSize * (colI + 1);
+      const posY = elementsSize * (rowI + 1);
+
+      if (col == 'O') {
+        if (!playerPosition.x && !playerPosition.y) {
+          playerPosition.x = posX;
+          playerPosition.y = posY;
+          // console.log({playerPosition});
+        }
+      } else if (col == 'I') {
+        giftPosition.x = posX;
+        giftPosition.y = posY;
+      } else if (col == 'X') {
+        enemyPositions.push({
+          x: posX,
+          y: posY,
+        });
+      }
+      
+      game.fillText(emoji, posX, posY);
+    });
+  });
+
+  movePlayer();
+}
