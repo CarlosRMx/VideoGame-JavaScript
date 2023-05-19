@@ -32,6 +32,8 @@ const goDown = document.querySelector('#down');
 const containerStatics = document.querySelector('.statics');
 const displayLives = document.querySelector('#lives');
 const displayTimer = document.querySelector('#timer');
+const displayRecord = document.querySelector('#record');
+const displayInfo = document.querySelector('#info');
 
 
 
@@ -45,10 +47,12 @@ window.addEventListener('resize',setCanvasSize);
 
 function setCanvasSize(){
     if(window.innerHeight > window.innerWidth){
-        canvaSize= window.innerWidth * 0.8;
+        canvaSize= window.innerWidth * 0.7;
     }else{
-        canvaSize = window.innerHeight *0.8;
+        canvaSize = window.innerHeight *0.7;
     }
+
+    canvaSize = Number(canvaSize.toFixed(0));
     canvas.setAttribute('width',canvaSize);
     canvas.setAttribute('height',canvaSize);
 
@@ -61,22 +65,25 @@ function startGame(){
     elemetSize = canvaSize / 10;
     displayLevels.font= elemetSize + 'px Verdana';
     displayLevels.textAlign = 'end';
+    
 
-    //obteniendo un array bidemensional para renderizar los mapas 
     const map = maps[level];
     if(!map){
         wonGame();
         return;
     }
-
+    
     if(!timeStart){
         timeStart=Date.now();
         timeInterval=setInterval(timerControl,100);
+        diplayBestResult();
     }
+
+    //obteniendo un array bidemensional para renderizar los mapas 
     const rowMap = map.trim().split('\n');
     const rowMapColumn = rowMap.map(row => row.trim().split(''));
 
-    // console.log(rowMapColumn);
+
     //!limpiando todo mapa para rendeizar una nueva posicion del jugador
     enemyCollisions=[];
     displayLevels.clearRect(0,0,canvaSize,canvaSize);
@@ -167,6 +174,22 @@ function failedLevel(){
 function wonGame(){
     console.log("Ganaste el juego");
     clearInterval(timeInterval);
+    timePlayer = timerControl();
+    
+    const recordTime = localStorage.getItem('record');
+    if(recordTime != null){
+        if(timePlayer <= recordTime){
+            localStorage.setItem('record',timePlayer);
+            displayInfo.textContent='Obtuviste un nuevo record 🏆'
+        }else{
+            console.log('No superaste el record, intenta de nuevo');
+            displayInfo.textContent='No superaste el record, intenta de nuevo 😟';
+        }
+    }else{
+        localStorage.setItem('record',timePlayer);
+        displayInfo.textContent='Genial tu primer record, ahora trata de superarlo 🏆';
+    
+    }
 }
 
 function showLives(){
@@ -174,9 +197,16 @@ function showLives(){
 }
 
 function timerControl(){
-    displayTimer.innerHTML = (Date.now() - timeStart)/1000;
+    const time=(Date.now() - timeStart)/1000;
+    displayTimer.innerHTML = time;
+    return time
 }
 
+function diplayBestResult(){
+    const getRecord= localStorage.getItem('record');
+    displayRecord.textContent = getRecord;
+
+}
 function keyBoardControl(event){
     const key = event.code;
     
