@@ -145,8 +145,6 @@ function displayPlayer(){
     }
 
     displayLevels.fillText(emojis['PLAYER'], playerPosition.x, playerPosition.y);
-    displayLevels.fillRect()
-
 }
 
 function nextLevel(){
