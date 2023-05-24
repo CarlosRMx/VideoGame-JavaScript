@@ -34,7 +34,7 @@ const displayLives = document.querySelector('#lives');
 const displayTimer = document.querySelector('#timer');
 const displayRecord = document.querySelector('#record');
 const displayInfo = document.querySelector('#info');
-
+const containerControls = document.querySelector('.controls');
 
 
 const canvas = document.querySelector('#game');
@@ -56,11 +56,12 @@ function setCanvasSize(){
     canvas.setAttribute('width',canvaSize);
     canvas.setAttribute('height',canvaSize);
 
+    playerPosition.x=undefined;
+    playerPosition.y=undefined;
     startGame();
 }
     
 function startGame(){
-
     //defining the size to the objects
     elemetSize = canvaSize / 10;
     displayLevels.font= elemetSize + 'px Verdana';
@@ -163,24 +164,30 @@ function failedLevel(){
         level=0;
         lives=3;
         timeStart=undefined;
+        const msgVidas='!Perdiste todas las vidas!';
+        alertsGame(msgVidas);
     }
     
     //**Reiniciando el mismo nivel al colisionar una vez */
     playerPosition.x=undefined;
     playerPosition.y=undefined;
-    startGame();
+    // displayLevels.fillText('Chocaste',200,200);
+
+    setTimeout(() => {
+        startGame();
+    }, 1000);
+    // startGame();
 }
 
 function wonGame(){
-    console.log("Ganaste el juego");
-    clearInterval(timeInterval);
+    const msgWinner='!Ganaste el juego!';
     timePlayer = timerControl();
     
     const recordTime = localStorage.getItem('record');
     if(recordTime != null){
         if(timePlayer <= recordTime){
             localStorage.setItem('record',timePlayer);
-            displayInfo.textContent='Obtuviste un nuevo record 🏆'
+            displayInfo.textContent='Obtuviste un nuevo record 🏆';
         }else{
             console.log('No superaste el record, intenta de nuevo');
             displayInfo.textContent='No superaste el record, intenta de nuevo 😟';
@@ -188,8 +195,22 @@ function wonGame(){
     }else{
         localStorage.setItem('record',timePlayer);
         displayInfo.textContent='Genial tu primer record, ahora trata de superarlo 🏆';
-    
+        
     }
+    clearInterval(timeInterval);
+
+    alertsGame(msgWinner);
+    clearButtons();
+    
+    const restartBtn = document.createElement('button');
+    restartBtn.textContent='Reiniciar';
+
+    restartBtn.addEventListener('click',()=>{
+        location.reload();
+    });
+    containerControls.appendChild(restartBtn);
+
+
 }
 
 function showLives(){
@@ -206,6 +227,13 @@ function diplayBestResult(){
     const getRecord= localStorage.getItem('record');
     displayRecord.textContent = getRecord;
 
+}
+function alertsGame(msg){
+    displayLevels.clearRect(0,0,canvaSize,canvaSize);
+    displayLevels.fillText(msg,canvaSize*1,canvaSize*0.4);
+    displayLevels.font= elemetSize + 'px Verdana';
+    displayLevels.fillStyle = "#3C40C7"; 
+    displayLevels.textAlign='center';
 }
 function keyBoardControl(event){
     const key = event.code;
@@ -271,3 +299,8 @@ function moveDown(){
     }
 }
 
+function clearButtons(){
+    while (containerControls.firstChild) {
+        containerControls.removeChild(containerControls.firstChild);
+    }
+}
